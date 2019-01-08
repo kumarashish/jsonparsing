@@ -89,7 +89,7 @@ public Sections(JSONObject jsonObject)
             options.clear();
             this.id = jsonObject.isNull("id") ? "" : jsonObject.getString("id");
             this.widgetType = jsonObject.isNull("widgetType") ? "" : jsonObject.getString("widgetType");
-            this.labelText = jsonObject.isNull("labelText") ? "" : jsonObject.getString("labelText");
+            this.labelText = jsonObject.isNull("labeltext") ? jsonObject.getString("labelText") : jsonObject.getString("labeltext");
             JSONArray optionsarray = jsonObject.isNull("options") ? null : jsonObject.getJSONArray("options");
             if(optionsarray!=null)
             {
@@ -136,11 +136,16 @@ public Sections(JSONObject jsonObject)
                  dependencyLabels.clear();
                  this.id = jsonObject.isNull("id") ? "" : jsonObject.getString("id");
                  this.optionText = jsonObject.isNull("optionText") ? "" : jsonObject.getString("optionText");
-                 this.defaultt = jsonObject.isNull("defaultt") ? "" : jsonObject.getString("defaultt");
+                 this.defaultt = jsonObject.isNull("default") ? "" : jsonObject.getString("default");
                  JSONArray dependencyarray = jsonObject.isNull("dependency") ? null : jsonObject.getJSONArray("dependency");
                  if (dependencyarray != null) {
                      for (int i = 0; i < dependencyarray.length(); i++) {
-                         dependencyLabels.add(new Labels(dependencyarray.getJSONObject(i)));
+                         JSONArray labelsDependencyArray=dependencyarray.getJSONObject(i).getJSONArray("labels");
+ for(int j=0;j<labelsDependencyArray.length();j++) {
+
+
+     dependencyLabels.add(new Labels(labelsDependencyArray.getJSONObject(j)));
+ }
                      }
                  }
              }catch (Exception ex)
