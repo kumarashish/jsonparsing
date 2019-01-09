@@ -2,11 +2,16 @@ package jsonparsing.com.samplejsonparsing;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -19,7 +24,8 @@ import java.io.UTFDataFormatException;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
-
+public ArrayList<Integer> depencyIdList=new ArrayList<>();
+public ArrayList<EditText> editTextList=new ArrayList<>();
 PatientInfo infoModel=null;
 FormModel formModel=null;
 LinearLayout mainLayout;
@@ -109,6 +115,7 @@ ArrayList<String>dependency=new ArrayList<>();
     public void addFooter()
     {
         if(formModel!=null) {
+            depencyIdList.clear();
             TextView textView1 = new TextView(this);
             textView1.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
             textView1.setGravity(Gravity.CENTER);
@@ -143,23 +150,45 @@ ArrayList<String>dependency=new ArrayList<>();
                 heading.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
                 heading.setGravity(Gravity.LEFT);
                 heading.setText(sections.getTitle().toUpperCase());
-
                 heading.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
-
                 heading.setPadding(20, 20, 20, 20);// in pixels (
                 mainLayout.addView( heading);
 
                  /* -------------------------------------*/
                 for(int j=0;j<sections.getLabels().size();j++) {
                     FormModel.Labels labels=sections.labels.get(j);
-
                     if(labels.getWidgetType().equalsIgnoreCase("text")) {
-                        TextView labelvalue = new TextView(this);
+                        TextView labelText = new TextView(this);
+                        labelText.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+                        labelText.setGravity(Gravity.LEFT);
+                        labelText.setText(labels.getLabelText());
+                        labelText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+                        labelText.setPadding(20, 20, 20, 20);// in pixels (
+                        mainLayout.addView( labelText);
+
+                        EditText labelvalue = new  EditText(this);
                         labelvalue.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
                         labelvalue.setGravity(Gravity.LEFT);
-                        labelvalue.setText(labels.getLabelText());
+                        labelvalue.setTag(labels.getLabelText());
                         labelvalue.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
                         labelvalue.setPadding(30, 5, 20, 5);// in pixels (
+                        editTextList.add(labelvalue);
+                        labelvalue.addTextChangedListener(new TextWatcher() {
+                            @Override
+                            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                            }
+
+                            @Override
+                            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                            }
+                            @Override
+                            public void afterTextChanged(Editable s) {
+                                 if(s.length()>0)
+                                 {
+
+                                 }
+                            }
+                        });
                         mainLayout.addView( labelvalue);
                          /* -------------------------------------*/
                     }else{
@@ -168,7 +197,6 @@ ArrayList<String>dependency=new ArrayList<>();
                         labelText.setGravity(Gravity.LEFT);
                         labelText.setText(labels.getLabelText());
                         labelText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-
                         labelText.setPadding(20, 20, 20, 20);// in pixels (
                         mainLayout.addView( labelText);
                          /* -----------------------------------------------------------------------------------------------------*/
@@ -185,7 +213,8 @@ ArrayList<String>dependency=new ArrayList<>();
                             radioGroup.addView(radioButton);
                              /* -------------------------------------*/
                             if(labels.options.get(k).dependencyLabels.size()>0)
-                            { dependencyLayout = new LinearLayout(MainActivity.this);
+                            { depencyIdList.add(Integer.parseInt(id));
+                                dependencyLayout = new LinearLayout(MainActivity.this);
                                 dependencyLayout .setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
                                 dependencyLayout.setOrientation(LinearLayout.VERTICAL);
                                 dependencyLayout.setId(Integer.parseInt("1111"));
@@ -208,7 +237,6 @@ ArrayList<String>dependency=new ArrayList<>();
                                         String idd=i+""+j+""+k+""+m+""+n;
                                         chbox.setId(Integer.parseInt(idd));
                                         dependencyLayout.addView( chbox);
-
                                         chbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                                             @Override
                                             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -249,11 +277,13 @@ ArrayList<String>dependency=new ArrayList<>();
                             @Override
                             public void onCheckedChanged(RadioGroup group, int checkedId) {
                                 Toast.makeText(MainActivity.this,Integer.toString(checkedId),Toast.LENGTH_SHORT).show();
-                                if(checkedId==101)
+                                if(depencyIdList.contains(checkedId))
                                 {
                                     finalDependencyLayout.setVisibility(View.VISIBLE);
-                                }else  if(checkedId==100){
-                                    finalDependencyLayout.setVisibility(View.GONE);
+                                }else  {
+                                    if( finalDependencyLayout!=null) {
+                                        finalDependencyLayout.setVisibility(View.GONE);
+                                    }
                                 }
 
                             }
@@ -262,20 +292,48 @@ ArrayList<String>dependency=new ArrayList<>();
                             dependencyLayout.setVisibility(View.GONE);
                             mainLayout.addView(dependencyLayout);
                         }
-
                   }
                }// le
-
-
-View view=new View(this);
-                LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
-                      1);
+                View view=new View(this);
+                LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 1);
                 layoutParams.setMargins(5, 5, 5, 5);
                 view.setLayoutParams(layoutParams);
                 view.setBackgroundColor(getResources().getColor(R.color.colorAccent));
                 mainLayout.addView(view);
-
             }
         }
+        Button submit=new Button(this);
+        submit.setText("SUBMIT");
+
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        layoutParams.setMargins(5, 30, 5, 30);
+        submit.setLayoutParams(layoutParams);
+        submit.setGravity(Gravity.CENTER);
+        submit.setTextColor(getResources().getColor(android.R.color.white));
+        submit.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+        submit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(isAllFieldsValidated()) {
+                    Toast.makeText(MainActivity.this, "All Fields Validated", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        mainLayout.addView(submit);
+
     }
+
+    public boolean isAllFieldsValidated() {
+        boolean status = true;
+        for (int i = 0; i < editTextList.size(); i++) {
+            if (editTextList.get(i).getText().length() == 0) {
+                Toast.makeText(MainActivity.this, "Please enter value for"+ editTextList.get(i).getTag().toString()+" in above fields",Toast.LENGTH_SHORT).show();
+                return false;
+            }
+        }
+        return status;
+    }
+
+
+
 }
