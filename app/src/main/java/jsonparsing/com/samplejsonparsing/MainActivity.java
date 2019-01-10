@@ -41,7 +41,7 @@ ArrayList<String>dependency=new ArrayList<>();
     public void jsonParsing()
     {
         try{
-            JSONObject jsonObject=new JSONObject(Common.json3);
+            JSONObject jsonObject=new JSONObject(Common.json2);
             if(jsonObject.getString("code").equalsIgnoreCase("200"))
             {
 
@@ -235,7 +235,9 @@ ArrayList<String>dependency=new ArrayList<>();
                                     String widgetType=depedencyLabel.widgetType;
                                     RadioGroup radioGroupp=new RadioGroup(this);
                                     radioGroup.setOrientation(LinearLayout.HORIZONTAL);
-                                    LinearLayout dependencyLayout2 = null;
+                                    LinearLayout dependencyLayout2 = new LinearLayout(MainActivity.this);
+                                    dependencyLayout2 .setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+                                    dependencyLayout2.setOrientation(LinearLayout.VERTICAL);
                                     /* ---------------------------dependency options check------------------------------------------------------*/
                                     for(int n=0;n<depedencyLabel.getOptions().size();n++)
                                     {
@@ -248,9 +250,7 @@ ArrayList<String>dependency=new ArrayList<>();
                                            final String idd = i + "0" + j + "0" + k + "0" + m + "0" + n;
                                             radioBtn.setId(Integer.parseInt(idd));
                                             radioGroupp.addView(radioBtn);
-                                            dependencyLayout2= new LinearLayout(MainActivity.this);
-                                            dependencyLayout2 .setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-                                            dependencyLayout2.setOrientation(LinearLayout.VERTICAL);
+
                                            for(int x=0;x<dependencyLabelOptions.getDependency().size();x++) {
                                                depencyIdList.add(Integer.parseInt(idd));
                                                FormModel.Labels level2label=dependencyLabelOptions.getDependency().get(x);
@@ -342,8 +342,29 @@ ArrayList<String>dependency=new ArrayList<>();
 
                                     }
 
-
-
+                                       if(radioGroupp!=null)
+                                       {
+                                           dependencyLayout.addView(radioGroupp);
+                                           dependencyLayout2.setVisibility(View.GONE);
+                                           dependencyLayout.addView(dependencyLayout2);
+                                       }
+                                  final LinearLayout finalDependencyLayout1 = dependencyLayout2;
+                                    final LinearLayout finalDependencyLayout= dependencyLayout;
+                                    radioGroupp.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+                                        @Override
+                                        public void onCheckedChanged(RadioGroup group, int checkedId) {
+                                            Toast.makeText(MainActivity.this,Integer.toString(checkedId),Toast.LENGTH_SHORT).show();
+                                            if(depencyIdList.contains(checkedId))
+                                            {finalDependencyLayout1.setVisibility(View.VISIBLE);
+                                               // finalDependencyLayout.addView(finalDependencyLayout1);
+                                            }else  {
+                                                if( finalDependencyLayout1!=null) {
+                                                    finalDependencyLayout1.setVisibility(View.GONE);
+                                                    //finalDependencyLayout.removeView(finalDependencyLayout1);
+                                                }
+                                            }
+                                        }
+                                    });
 
                                 }
                             }
@@ -363,7 +384,6 @@ ArrayList<String>dependency=new ArrayList<>();
                                         finalDependencyLayout.setVisibility(View.GONE);
                                     }
                                 }
-
                             }
                         });
                         if(dependencyLayout!=null) {
