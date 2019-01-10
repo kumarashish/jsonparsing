@@ -41,12 +41,12 @@ ArrayList<String>dependency=new ArrayList<>();
     public void jsonParsing()
     {
         try{
-            JSONObject jsonObject=new JSONObject(Common.json);
+            JSONObject jsonObject=new JSONObject(Common.json3);
             if(jsonObject.getString("code").equalsIgnoreCase("200"))
             {
 
                 JSONObject result=jsonObject.getJSONObject("result");
-                infoModel=new PatientInfo(result.getJSONObject("patient"));
+                //infoModel=new PatientInfo(result.getJSONObject("patient"));
                 formModel=new FormModel(result.getJSONObject("form"));
 
 
@@ -154,8 +154,9 @@ ArrayList<String>dependency=new ArrayList<>();
                 heading.setPadding(20, 20, 20, 20);// in pixels (
                 mainLayout.addView( heading);
 
-                 /* -------------------------------------*/
+                /* ---------------------------labels check------------------------------------------------------*/
                 for(int j=0;j<sections.getLabels().size();j++) {
+
                     FormModel.Labels labels=sections.labels.get(j);
                     if(labels.getWidgetType().equalsIgnoreCase("text")) {
                         TextView labelText = new TextView(this);
@@ -190,7 +191,7 @@ ArrayList<String>dependency=new ArrayList<>();
                             }
                         });
                         mainLayout.addView( labelvalue);
-                         /* -------------------------------------*/
+                         /* ------------------------------------------------------------------------------*/
                     }else{
                         TextView labelText = new TextView(this);
                         labelText.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
@@ -199,11 +200,12 @@ ArrayList<String>dependency=new ArrayList<>();
                         labelText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
                         labelText.setPadding(20, 20, 20, 20);// in pixels (
                         mainLayout.addView( labelText);
-                         /* -----------------------------------------------------------------------------------------------------*/
+                         /* ------------------------------------------------------------------------------------------------------------------*/
                          RadioGroup radioGroup=new RadioGroup(this);
                          radioGroup.setOrientation(LinearLayout.HORIZONTAL);
 
                         LinearLayout dependencyLayout=null;
+                        /* ---------------------------options check------------------------------------------------------*/
                         for(int k=0;k<labels.getOptions().size();k++)
                         {
                             RadioButton radioButton = new RadioButton(this);
@@ -211,13 +213,14 @@ ArrayList<String>dependency=new ArrayList<>();
                             String id=i+""+j+""+k;
                             radioButton.setId(Integer.parseInt(id));
                             radioGroup.addView(radioButton);
-                             /* -------------------------------------*/
+                             /* ---------------------------dependency check------------------------------------------------------*/
                             if(labels.options.get(k).dependencyLabels.size()>0)
                             { depencyIdList.add(Integer.parseInt(id));
                                 dependencyLayout = new LinearLayout(MainActivity.this);
                                 dependencyLayout .setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
                                 dependencyLayout.setOrientation(LinearLayout.VERTICAL);
                                 dependencyLayout.setId(Integer.parseInt("1111"));
+                                /* ---------------------------dependency labels check------------------------------------------------------*/
                                 for(int m=0;m<labels.options.get(k).dependencyLabels.size();m++)
                                 {
                                     FormModel.Labels depedencyLabel=labels.options.get(k).dependencyLabels.get(m);
@@ -229,49 +232,124 @@ ArrayList<String>dependency=new ArrayList<>();
                                     textView.setText(depedencyLabel.getLabelText());
                                     textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
                                     dependencyLayout.addView(textView);
+                                    String widgetType=depedencyLabel.widgetType;
+                                    RadioGroup radioGroupp=new RadioGroup(this);
+                                    radioGroup.setOrientation(LinearLayout.HORIZONTAL);
+                                    LinearLayout dependencyLayout2 = null;
+                                    /* ---------------------------dependency options check------------------------------------------------------*/
                                     for(int n=0;n<depedencyLabel.getOptions().size();n++)
                                     {
                                         FormModel.Options dependencyLabelOptions=depedencyLabel.getOptions().get(n);
-                                       final  CheckBox chbox= new CheckBox(this);
-                                        chbox.setText(dependencyLabelOptions.optionText);
-                                        String idd=i+""+j+""+k+""+m+""+n;
-                                        chbox.setId(Integer.parseInt(idd));
-                                        dependencyLayout.addView( chbox);
-                                        chbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                                            @Override
-                                            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                                                 if(isChecked)
-                                                 {
-                                                     if(!dependency.contains( chbox.getText().toString()))
-                                                     {
-                                                         dependency.add( chbox.getText().toString());
-                                                     }
-                                                 }else{
-                                                     if(dependency.contains( chbox.getText().toString()))
-                                                     {
-                                                         dependency.remove( chbox.getText().toString());
-                                                     }
-                                                 }
-                                                 String checkedItem="";
-                                                 for(int i=0;i<dependency.size();i++)
-                                                 {
-                                                     if(i==0)
-                                                     {
-                                                         checkedItem =dependency.get(i);
-                                                     }else {
-                                                         checkedItem += "," + dependency.get(i);
-                                                     }
-                                                 }
-                                                Toast.makeText(MainActivity.this,checkedItem,Toast.LENGTH_SHORT).show();
+                                       
+                                         if(widgetType.equalsIgnoreCase("radio"))
+                                        {
+                                            RadioButton radioBtn = new RadioButton(this);
+                                            radioBtn.setText(dependencyLabelOptions.optionText);
+                                           final String idd = i + "0" + j + "0" + k + "0" + m + "0" + n;
+                                            radioBtn.setId(Integer.parseInt(idd));
+                                            radioGroupp.addView(radioBtn);
+                                            dependencyLayout2= new LinearLayout(MainActivity.this);
+                                            dependencyLayout2 .setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+                                            dependencyLayout2.setOrientation(LinearLayout.VERTICAL);
+                                           for(int x=0;x<dependencyLabelOptions.getDependency().size();x++) {
+                                               depencyIdList.add(Integer.parseInt(idd));
+                                               FormModel.Labels level2label=dependencyLabelOptions.getDependency().get(x);
+                                               TextView label2Text = new TextView(this);
+                                               label2Text.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+                                               label2Text.setGravity(Gravity.LEFT);
+                                               label2Text.setText(level2label.getLabelText());
+                                               label2Text.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+                                               label2Text.setPadding(20, 20, 20, 20);// in pixels (
+                                               dependencyLayout2.addView( label2Text);
+                                               /* ------------------------------------------------------------------------------------------------------------------*/
+                                               String widgetType2= level2label.widgetType;
+                                               for(int y=0;y<level2label.getOptions().size();y++) {
+                                                   if(widgetType2.equalsIgnoreCase("Checkbox"))
+                                                   {
+                                                       FormModel.Options options2=level2label.options.get(y);
+                                                       final CheckBox chbox = new CheckBox(this);
+                                                       chbox.setText( options2.optionText);
+                                                       String iddd = i + "" + j + "" + k + "" + m + "" + n+""+x+""+y;
+                                                       chbox.setId(Integer.parseInt(iddd));
+                                                       dependencyLayout2.addView(chbox);
+                                                   }
 
-                                            }
-                                        });
+                                               }
+
+//
+
+                                               /* ------------------------------------------------------------------------------------------------------------------*/
+
+                                           }
+
+
+
+
+                                        }
+                                        else if(widgetType.equalsIgnoreCase("checkbox")) {
+                                            final CheckBox chbox = new CheckBox(this);
+                                            chbox.setText(dependencyLabelOptions.optionText);
+                                            String idd = i + "" + j + "" + k + "" + m + "" + n;
+                                            chbox.setId(Integer.parseInt(idd));
+                                            dependencyLayout.addView(chbox);
+                                            chbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                                                @Override
+                                                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                                                    if (isChecked) {
+                                                        if (!dependency.contains(chbox.getText().toString())) {
+                                                            dependency.add(chbox.getText().toString());
+                                                        }
+                                                    } else {
+                                                        if (dependency.contains(chbox.getText().toString())) {
+                                                            dependency.remove(chbox.getText().toString());
+                                                        }
+                                                    }
+                                                    String checkedItem = "";
+                                                    for (int i = 0; i < dependency.size(); i++) {
+                                                        if (i == 0) {
+                                                            checkedItem = dependency.get(i);
+                                                        } else {
+                                                            checkedItem += "," + dependency.get(i);
+                                                        }
+                                                    }
+                                                    Toast.makeText(MainActivity.this, checkedItem, Toast.LENGTH_SHORT).show();
+
+                                                }
+                                            });
+                                        }
+                                        else if(widgetType.equalsIgnoreCase("text"))
+                                        {
+                                            TextView label = new TextView(this);
+                                            label.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+                                            label.setGravity(Gravity.LEFT);
+                                            label.setText(dependencyLabelOptions.optionText);
+                                            label.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+                                            label.setPadding(20, 20, 20, 20);// in pixels (
+                                            dependencyLayout.addView( labelText);
+
+                                            EditText labelvalue = new  EditText(this);
+                                            labelvalue.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+                                            labelvalue.setGravity(Gravity.LEFT);
+                                            labelvalue.setTag(dependencyLabelOptions.optionText);
+                                            labelvalue.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+                                            labelvalue.setPadding(30, 5, 20, 5);// in pixels (
+                                            editTextList.add(labelvalue);
+                                            dependencyLayout.addView( labelvalue);
+
+                                        }
+
+
 
                                     }
+
+
+
+
                                 }
                             }
                         }
                         mainLayout.addView(radioGroup);
+
                         final LinearLayout finalDependencyLayout = dependencyLayout;
                         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
                             @Override
@@ -304,7 +382,6 @@ ArrayList<String>dependency=new ArrayList<>();
         }
         Button submit=new Button(this);
         submit.setText("SUBMIT");
-
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         layoutParams.setMargins(5, 30, 5, 30);
         submit.setLayoutParams(layoutParams);
