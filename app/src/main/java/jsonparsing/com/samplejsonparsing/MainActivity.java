@@ -281,12 +281,24 @@ ArrayList<String>dependency=new ArrayList<>();
                                                /* ------------------------------------------------------------------------------------------------------------------*/
                                                String widgetType2= level2label.widgetType;
 
+                                               if ( widgetType2.equalsIgnoreCase("text")) {
+                                                   LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,60);
+                                                   lp.setMargins(20,10,20,10);
+                                                   EditText labelvalue = new EditText(this);
+                                                   labelvalue.setLayoutParams( lp);
+                                                   labelvalue.setGravity(Gravity.LEFT);
+                                                   labelvalue.setTag(level2label.getLabelText());
+                                                   labelvalue.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+                                                   labelvalue.setPadding(30, 5, 20, 5);// in pixels
+                                                   labelvalue.setBackgroundDrawable(getResources().getDrawable(R.drawable.blurr_bg_edittext));// (
+                                                   editTextList.add(labelvalue);
+                                                   dependencyLayout2.addView(labelvalue);
+                                               }
 
                                                for(int y=0;y<level2label.getOptions().size();y++) {
                                                    FormModel.Options options2=level2label.options.get(y);
                                                    if(widgetType2.equalsIgnoreCase("Checkbox"))
                                                    {
-
                                                        final CheckBox chbox = new CheckBox(this);
                                                        chbox.setText( options2.optionText);
                                                        String iddd = i + "" + j + "" + k + "" + m + "" + n+""+x+""+y;
@@ -300,8 +312,7 @@ ArrayList<String>dependency=new ArrayList<>();
                                                        label.setText(options2.optionText);
                                                        label.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
                                                        label.setPadding(20, 20, 20, 20);// in pixels (
-                                                       dependencyLayout2.addView( labelText);
-
+                                                       dependencyLayout2.addView(  label);
                                                        EditText labelvalue = new  EditText(this);
                                                        labelvalue.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
                                                        labelvalue.setGravity(Gravity.LEFT);
@@ -309,7 +320,7 @@ ArrayList<String>dependency=new ArrayList<>();
                                                        labelvalue.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
                                                        labelvalue.setPadding(30, 5, 20, 5);// in pixels (
                                                        editTextList.add(labelvalue);
-                                                       dependencyLayout.addView( labelvalue);
+                                                       dependencyLayout2.addView( labelvalue);
                                                    }else if(widgetType2.equalsIgnoreCase("radio"))
                                                    {
                                                        RadioButton radioB = new RadioButton(this);
