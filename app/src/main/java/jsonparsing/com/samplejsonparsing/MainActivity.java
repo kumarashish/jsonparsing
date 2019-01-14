@@ -23,6 +23,8 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.whygraphics.multilineradiogroup.MultiLineRadioGroup;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -31,14 +33,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity {
-public ArrayList<Integer> depencyIdList=new ArrayList<>();
-public ArrayList<EditText> editTextList=new ArrayList<>();
-PatientInfo infoModel=null;
-FormModel formModel=null;
-LinearLayout mainLayout;
-ArrayList<String>dependency=new ArrayList<>();
-ArrayList<RequestModel>request=new ArrayList<>();
-   HashMap<String, RequestModel> map = new HashMap<String, RequestModel>();
+    public ArrayList<Integer> depencyIdList=new ArrayList<>();
+    public ArrayList<EditText> editTextList=new ArrayList<>();
+    PatientInfo infoModel=null;
+    FormModel formModel=null;
+    LinearLayout mainLayout;
+    ArrayList<String>dependency=new ArrayList<>();
+    ArrayList<RequestModel>request=new ArrayList<>();
+    HashMap<String, RequestModel> map = new HashMap<String, RequestModel>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,15 +74,15 @@ ArrayList<RequestModel>request=new ArrayList<>();
     {
         if(infoModel!=null)
         {
-            TextView textView1 =getTextView(infoModel.getName());
+            TextView textView1 =getTextView(infoModel.getName(),1);
             mainLayout.addView(textView1);
 
             // Add textview 2
-            TextView textView2 = getTextView("Age : "+infoModel.getAge());
+            TextView textView2 = getTextView("Age : "+infoModel.getAge(),1);
             mainLayout.addView(textView2);
-            TextView textView3 = getTextView("Gender : "+infoModel.Gender);
+            TextView textView3 = getTextView("Gender : "+infoModel.Gender,1);
             mainLayout.addView(textView3);
-            TextView textView4 = getTextView("Umr Number : "+infoModel.getUMRNo());
+            TextView textView4 = getTextView("Umr Number : "+infoModel.getUMRNo(),1);
             mainLayout.addView(textView4);
 
         }
@@ -92,10 +94,10 @@ ArrayList<RequestModel>request=new ArrayList<>();
     public void addFooter() {
         if (formModel != null) {
             depencyIdList.clear();
-            TextView textView1 = getTextView(formModel.getFormName());
+            TextView textView1 = getTextView(formModel.getFormName(),1);
             mainLayout.addView(textView1);
             /* -------------------------------------*/
-            TextView textView2 = getTextView(formModel.getFormType());
+            TextView textView2 = getTextView(formModel.getFormType(),1);
             mainLayout.addView(textView2);
             /* -------------------------------------*/
             View vieww = getView();
@@ -103,22 +105,22 @@ ArrayList<RequestModel>request=new ArrayList<>();
             /* -------------------------------------*/
             for (int i = 0; i < formModel.getSection().size(); i++) {
                 FormModel.Sections sections = formModel.section.get(i);
-                TextView heading = getTextView(sections.getTitle().toUpperCase());
+                TextView heading = getTextView(sections.getTitle().toUpperCase(),1);
                 mainLayout.addView(heading);
 
                 /* ---------------------------labels check------------------------------------------------------*/
                 for (int j = 0; j < sections.getLabels().size(); j++) {
                     final FormModel.Labels labels = sections.labels.get(j);
                     if (labels.getWidgetType().equalsIgnoreCase("text")) {
-                        TextView labelText = getTextView(labels.getLabelText());
+                        TextView labelText = getTextView(labels.getLabelText(),1);
                         mainLayout.addView(labelText);
-                        EditText labelvalue = getEditText();
+                        EditText labelvalue = getEditText(1);
                         labelvalue.setTag(labels.getLabelText());
                         labelvalue.setId(Integer.parseInt(labels.getId()));
-                         editTextList.add(labelvalue);
-                         mainLayout.addView(labelvalue);
-                         map.put(labels.getLabelText(),new RequestModel(labels.getId(),labels.getLabelText(),"0","","0"));
-                         labelvalue.addTextChangedListener(new TextWatcher() {
+                        editTextList.add(labelvalue);
+                        mainLayout.addView(labelvalue);
+                        map.put(labels.getLabelText(),new RequestModel(labels.getId(),labels.getLabelText(),"0","","0"));
+                        labelvalue.addTextChangedListener(new TextWatcher() {
                             @Override
                             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
@@ -140,22 +142,31 @@ ArrayList<RequestModel>request=new ArrayList<>();
                         /* ------------------------------------------------------------------------------*/
                     } else {
 
-                        TextView labelText = getTextView(labels.getLabelText());
+                        TextView labelText = getTextView(labels.getLabelText(),1);
                         mainLayout.addView(labelText);
                         /* ------------------------------------------------------------------------------------------------------------------*/
-                        RadioGroup radioGroup = new RadioGroup(this);
+
+                        MultiLineRadioGroup radioGroup = new MultiLineRadioGroup(this);
                         radioGroup.setOrientation(LinearLayout.HORIZONTAL);
+                        radioGroup.setPadding(20,0,20,0);
+                        radioGroup.setMaxInRow(3);
+
                         LinearLayout dependencyLayout = null;
 
                         /* ---------------------------options check------------------------------------------------------*/
                         for (int k = 0; k < labels.getOptions().size(); k++) {
-                            FormModel.Options op=labels.options.get(k);
+                            FormModel.Options op = labels.options.get(k);
                             RadioButton radioButton = getRadioButton(op.getOptionText());
                             radioButton.setId(Integer.parseInt(op.getId()));
-                            radioGroup.addView(radioButton);
 
-                                RequestModel model=new RequestModel(labels.getId(),labels.getLabelText(),op.id,op.optionText,"0");
-                                map.put(labels.getLabelText()+""+op.getOptionText(),model);
+                            radioGroup.addView(radioButton);
+                            if (op.getDefaultt().equalsIgnoreCase("1"))
+                            {
+                                radioGroup.check(Integer.parseInt(op.getId()));
+                            }
+
+                            RequestModel model=new RequestModel(labels.getId(),labels.getLabelText(),op.id,op.optionText,"0");
+                            map.put(labels.getLabelText()+""+op.getOptionText(),model);
 
 
                             /* ---------------------------dependency check------------------------------------------------------*/
@@ -166,17 +177,19 @@ ArrayList<RequestModel>request=new ArrayList<>();
                                 for (int m = 0; m < labels.options.get(k).dependencyLabels.size(); m++) {
                                     final FormModel.Labels depedencyLabel = labels.options.get(k).dependencyLabels.get(m);
 
-                                    TextView textView = getTextView(depedencyLabel.getLabelText());
+                                    TextView textView = getTextView(depedencyLabel.getLabelText(),2);
                                     dependencyLayout.addView(textView);
                                     String widgetType = depedencyLabel.widgetType;
-                                    RadioGroup radioGroupp = new RadioGroup(this);
-                                    radioGroup.setOrientation(LinearLayout.HORIZONTAL);
-                                    LinearLayout dependencyLayout2 =getLinearLayout();
+                                    MultiLineRadioGroup radioGroupp = new MultiLineRadioGroup(this);
+                                    radioGroupp.setOrientation(LinearLayout.HORIZONTAL);
+                                    radioGroupp.setPadding(40,0,40,0);
+                                    radioGroupp.setMaxInRow(3);
+                                    final LinearLayout dependencyLayout2 =getLinearLayout();
                                     if (widgetType.equalsIgnoreCase("text")) {
                                         RequestModel model1=new RequestModel(depedencyLabel.getId(),depedencyLabel.getLabelText(),"0","",op.getId());
                                         map.put(depedencyLabel.getLabelText(),model1);
 
-                                        EditText labelvalue = getEditText();
+                                        EditText labelvalue = getEditText(2);
                                         labelvalue.setTag(depedencyLabel.getLabelText());
                                         labelvalue.setId(Integer.parseInt(depedencyLabel.getId()));
                                         labelvalue.addTextChangedListener(new TextWatcher() {
@@ -203,19 +216,22 @@ ArrayList<RequestModel>request=new ArrayList<>();
                                     /* ---------------------------dependency options check------------------------------------------------------*/
                                     for (int n = 0; n < depedencyLabel.getOptions().size(); n++) {
                                         final FormModel.Options dependencyLabelOptions = depedencyLabel.getOptions().get(n);
-
                                         if (widgetType.equalsIgnoreCase("radio")) {
                                             RadioButton radioBtn = getRadioButton(dependencyLabelOptions.optionText);
-                                            final String idd = i + "0" + j + "0" + k + "0" + m + "0" + n;
-                                            radioBtn.setId(Integer.parseInt(idd));
+                                            radioBtn.setId(Integer.parseInt(dependencyLabelOptions .getId()));
                                             radioGroupp.addView(radioBtn);
+                                            if(dependencyLabelOptions.getDefaultt().equalsIgnoreCase("1"))
+                                            {
+                                                radioGroupp.check(Integer.parseInt(dependencyLabelOptions .getId()));
+                                            }
+
                                             RequestModel model1=new RequestModel(depedencyLabel.getId(),depedencyLabel.getLabelText(),dependencyLabelOptions.getId(),dependencyLabelOptions.getOptionText(),op.getId());
                                             map.put(depedencyLabel.getLabelText()+""+ dependencyLabelOptions.getOptionText(),model1);
 
                                             for (int x = 0; x < dependencyLabelOptions.getDependency().size(); x++) {
-                                                depencyIdList.add(Integer.parseInt(idd));
-                                              final  FormModel.Labels level2label = dependencyLabelOptions.getDependency().get(x);
-                                                TextView label2Text = getTextView(level2label.getLabelText());
+                                                depencyIdList.add(Integer.parseInt(dependencyLabelOptions .getId()));
+                                                final  FormModel.Labels level2label = dependencyLabelOptions.getDependency().get(x);
+                                                TextView label2Text = getTextView(level2label.getLabelText(),3);
                                                 dependencyLayout2.addView(label2Text);
                                                 /* ------------------------------------------------------------------------------------------------------------------*/
                                                 String widgetType2 = level2label.widgetType;
@@ -224,7 +240,7 @@ ArrayList<RequestModel>request=new ArrayList<>();
                                                     RequestModel model2=new RequestModel(level2label.getId(),level2label.getLabelText(),"0","",dependencyLabelOptions.getId());
                                                     map.put(level2label.getLabelText(),model2);
 
-                                                    EditText labelvalue = getEditText();
+                                                    EditText labelvalue = getEditText(3);
                                                     labelvalue.setTag(level2label.getLabelText());
                                                     labelvalue.setId(Integer.parseInt(level2label.getId()));
                                                     editTextList.add(labelvalue);
@@ -255,25 +271,84 @@ ArrayList<RequestModel>request=new ArrayList<>();
                                                     map.put(level2label.getLabelText()+""+options2.getOptionText(),model2);
 
                                                     if (widgetType2.equalsIgnoreCase("Checkbox")) {
-                                                        final CheckBox chbox = getCheckBox(options2.optionText);
-                                                            chbox.setId(Integer.parseInt(options2.getId()));
-                                                            dependencyLayout2.addView(chbox);
-
+                                                        final CheckBox chbox = getCheckBox(options2.optionText,3);
+                                                        chbox.setId(Integer.parseInt(options2.getId()));
+                                                        if(options2.getDefaultt().equalsIgnoreCase("1"))
+                                                        {
+                                                            chbox.setChecked(true);
+                                                        }
+                                                        dependencyLayout2.addView(chbox);
+                                                         final LinearLayout dependencyLayout3=getLinearLayout();
                                                         chbox .setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                                                             @Override
                                                             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-
                                                                 RequestModel model=map.get(level2label.getLabelText()+""+chbox.getText().toString());
-                                                               handleRequest(model);
+                                                                handleRequest(model);
+                                                                if(isChecked) {
+                                                                    if (depencyIdList.contains(chbox.getId())) {
+                                                                        dependencyLayout3.setVisibility(View.VISIBLE);
+                                                                    }
+                                                                }else{
+                                                                    dependencyLayout3.setVisibility(View.GONE);
+                                                                }
                                                             }
                                                         });
+
+                                                       if(options2.getDependency().size()>0)
+                                                       {/*****************getLabel 3*******************/
+                                                           for(int a=0;a<options2.getDependency().size();a++)
+                                                           {depencyIdList.add(chbox.getId());
+                                                               final FormModel.Labels label3=options2.getDependency().get(a);
+                                                               if(label3.getWidgetType().equalsIgnoreCase("text"))
+                                                               {
+                                                                   RequestModel model4=new RequestModel(label3.getId(),label3.getLabelText(),"0","",options2.getId());
+                                                                   map.put(label3.getLabelText()+""+label3.getId(),model4);
+                                                                   TextView label=getTextView(label3.getLabelText(),4);
+                                                                   dependencyLayout3.addView(label);
+                                                                   EditText labelvalue = getEditText(4);
+                                                                   labelvalue.setTag(label3.getLabelText());
+                                                                   labelvalue.setId(Integer.parseInt(label3.getId()));
+                                                                   editTextList.add(labelvalue);
+                                                                   dependencyLayout3.addView(labelvalue);
+                                                                   labelvalue.addTextChangedListener(new TextWatcher() {
+                                                                       @Override
+                                                                       public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                                                                       }
+
+                                                                       @Override
+                                                                       public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                                                                       }
+
+                                                                       @Override
+                                                                       public void afterTextChanged(Editable editable) {
+                                                                           RequestModel model=map.get(label3.getLabelText()+""+label3.getId());
+                                                                           model.setOption_value(editable.toString());
+                                                                           handleRequest(model);
+
+                                                                       }
+                                                                   });
+                                                               }
+                                                               if(dependencyLayout3.getChildCount()>0)
+                                                               {    dependencyLayout3.setVisibility(View.GONE);
+                                                                   dependencyLayout2.addView(dependencyLayout3);
+                                                               }
+
+
+                                                           }
+
+
+
+
+                                                       }
                                                     } else if (widgetType2.equalsIgnoreCase("text")) {
                                                         RequestModel model3=new RequestModel(level2label.getId(),level2label.getLabelText(),"0","",dependencyLabelOptions.getId());
                                                         map.put(level2label.getLabelText(),model3);
 
-                                                        TextView label = getTextView(options2.optionText);
+                                                        TextView label = getTextView(options2.optionText,3);
                                                         dependencyLayout2.addView(label);
-                                                        EditText labelvalue = getEditText();
+                                                        EditText labelvalue = getEditText(3);
                                                         labelvalue.setTag(options2.optionText);
                                                         labelvalue.setId(Integer.parseInt(options2.getId()));
                                                         editTextList.add(labelvalue);
@@ -293,12 +368,16 @@ ArrayList<RequestModel>request=new ArrayList<>();
                                                             public void afterTextChanged(Editable editable) {
                                                                 RequestModel model=map.get(level2label.getLabelText());
                                                                 model.setOption_value(editable.toString());
-                                                                        handleRequest(model);
+                                                                handleRequest(model);
                                                             }
                                                         });
                                                     } else if (widgetType2.equalsIgnoreCase("radio")) {
                                                         RadioButton radioB = getRadioButton(options2.optionText);
                                                         radioB.setId(Integer.parseInt(options2.getId()));
+                                                        if(options2.getDefaultt().equalsIgnoreCase("1"))
+                                                        {
+                                                            radioB.setChecked(true);
+                                                        }
                                                         dependencyLayout2.addView(radioB);
 
 
@@ -312,11 +391,15 @@ ArrayList<RequestModel>request=new ArrayList<>();
 
                                             }
                                         } else if (widgetType.equalsIgnoreCase("checkbox")) {
-                                            final CheckBox chbox = getCheckBox(dependencyLabelOptions.optionText);
+                                            final CheckBox chbox = getCheckBox(dependencyLabelOptions.optionText,2);
                                             RequestModel model3=new RequestModel(depedencyLabel.getId(),depedencyLabel.getLabelText(),dependencyLabelOptions.id,dependencyLabelOptions.getOptionText(),dependencyLabelOptions.getId());
                                             map.put(depedencyLabel.getLabelText()+""+dependencyLabelOptions.optionText,model3);
-
+                                            final LinearLayout  dependencyLayout3=getLinearLayout();
                                             chbox.setId(Integer.parseInt(dependencyLabelOptions.getId()));
+                                            if(dependencyLabelOptions.getDefaultt().equalsIgnoreCase("1"))
+                                            {
+                                                chbox.setChecked(true);
+                                            }
                                             dependencyLayout.addView(chbox);
                                             chbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                                                 @Override
@@ -343,12 +426,117 @@ ArrayList<RequestModel>request=new ArrayList<>();
                                                     handleRequest(model);
                                                     Toast.makeText(MainActivity.this, checkedItem, Toast.LENGTH_SHORT).show();
 
+                                                    for (int x = 0; x < dependencyLabelOptions.getDependency().size(); x++) {
+                                                        depencyIdList.add(Integer.parseInt(dependencyLabelOptions.getId()));
+                                                        final  FormModel.Labels level2label = dependencyLabelOptions.getDependency().get(x);
+                                                        TextView label2Text = getTextView(level2label.getLabelText(),3);
+                                                        dependencyLayout3.addView(label2Text);
+                                                /* ------------------------------------------------------------------------------------------------------------------*/
+                                                        String widgetType2 = level2label.widgetType;
+
+                                                        if (widgetType2.equalsIgnoreCase("text")) {
+                                                            RequestModel model2=new RequestModel(level2label.getId(),level2label.getLabelText(),"0","",dependencyLabelOptions.getId());
+                                                            map.put(level2label.getLabelText(),model2);
+
+                                                            EditText labelvalue = getEditText(3);
+                                                            labelvalue.setTag(level2label.getLabelText());
+                                                            labelvalue.setId(Integer.parseInt(level2label.getId()));
+                                                            editTextList.add(labelvalue);
+                                                            dependencyLayout3.addView(labelvalue);
+                                                            labelvalue.addTextChangedListener(new TextWatcher() {
+                                                                @Override
+                                                                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                                                                }
+
+                                                                @Override
+                                                                public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                                                                }
+
+                                                                @Override
+                                                                public void afterTextChanged(Editable editable) {
+                                                                    RequestModel model=map.get(level2label.getLabelText());
+                                                                    model.setOption_value(editable.toString());
+                                                                    handleRequest(model);
+                                                                }
+                                                            });
+                                                        }
+
+                                                        for (int y = 0; y < level2label.getOptions().size(); y++) {
+                                                            FormModel.Options options2 = level2label.options.get(y);
+                                                            RequestModel model2=new RequestModel(level2label.getId(),level2label.getLabelText(),options2.getId(),options2.getOptionText(),dependencyLabelOptions.getId());
+                                                            map.put(level2label.getLabelText()+""+options2.getOptionText(),model2);
+
+                                                            if (widgetType2.equalsIgnoreCase("Checkbox")) {
+                                                                final CheckBox chbox = getCheckBox(options2.optionText,3);
+                                                                chbox.setId(Integer.parseInt(options2.getId()));
+                                                                if((options2.getDefaultt().equalsIgnoreCase("1")))
+                                                                {
+                                                                    chbox.setChecked(true);
+                                                                }
+                                                                dependencyLayout3.addView(chbox);
+
+                                                                chbox .setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                                                                    @Override
+                                                                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+                                                                        RequestModel model=map.get(level2label.getLabelText()+""+chbox.getText().toString());
+                                                                        handleRequest(model);
+                                                                    }
+                                                                });
+
+                                                            } else if (widgetType2.equalsIgnoreCase("text")) {
+                                                                RequestModel model3=new RequestModel(level2label.getId(),level2label.getLabelText(),"0","",dependencyLabelOptions.getId());
+                                                                map.put(level2label.getLabelText(),model3);
+
+                                                                TextView label = getTextView(options2.optionText,3);
+                                                                dependencyLayout3.addView(label);
+                                                                EditText labelvalue = getEditText(3);
+                                                                labelvalue.setTag(options2.optionText);
+                                                                labelvalue.setId(Integer.parseInt(options2.getId()));
+                                                                editTextList.add(labelvalue);
+                                                                dependencyLayout3.addView(labelvalue);
+                                                                labelvalue.addTextChangedListener(new TextWatcher() {
+                                                                    @Override
+                                                                    public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                                                                    }
+
+                                                                    @Override
+                                                                    public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                                                                    }
+
+                                                                    @Override
+                                                                    public void afterTextChanged(Editable editable) {
+                                                                        RequestModel model=map.get(level2label.getLabelText());
+                                                                        model.setOption_value(editable.toString());
+                                                                        handleRequest(model);
+                                                                    }
+                                                                });
+                                                            } else if (widgetType2.equalsIgnoreCase("radio")) {
+                                                                RadioButton radioB = getRadioButton(options2.optionText);
+                                                                radioB.setId(Integer.parseInt(options2.getId()));
+                                                                dependencyLayout3.addView(radioB);
+
+
+                                                            }
+
+                                                        }
+
+//
+
+                                                /* ------------------------------------------------------------------------------------------------------------------*/
+
+                                                    }
+
                                                 }
                                             });
                                         } else if (widgetType.equalsIgnoreCase("text")) {
-                                            TextView label = getTextView(dependencyLabelOptions.optionText);
+                                            TextView label = getTextView(dependencyLabelOptions.optionText,2);
                                             dependencyLayout.addView(label);
-                                            EditText labelvalue = getEditText();
+                                            EditText labelvalue = getEditText(2);
                                             labelvalue.setId(Integer.parseInt(dependencyLabelOptions.getId()));
                                             labelvalue.setTag(dependencyLabelOptions.optionText);
                                             editTextList.add(labelvalue);
@@ -368,7 +556,7 @@ ArrayList<RequestModel>request=new ArrayList<>();
                                                 public void afterTextChanged(Editable editable) {
                                                     RequestModel model=map.get(dependencyLabelOptions.getOptionText());
                                                     model.setOption_value(editable.toString());
-                                                            handleRequest(model);
+                                                    handleRequest(model);
                                                 }
                                             });
 
@@ -382,11 +570,11 @@ ArrayList<RequestModel>request=new ArrayList<>();
                                     }
                                     final LinearLayout finalDependencyLayout1 = dependencyLayout2;
                                     final LinearLayout finalDependencyLayout = dependencyLayout;
-                                    radioGroupp.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+                                    radioGroupp.setOnCheckedChangeListener(new MultiLineRadioGroup.OnCheckedChangeListener() {
                                         @Override
-                                        public void onCheckedChanged(RadioGroup group, int checkedId) {
-                                            Toast.makeText(MainActivity.this, Integer.toString(checkedId), Toast.LENGTH_SHORT).show();
-                                            if (depencyIdList.contains(checkedId)) {
+                                        public void onCheckedChanged(ViewGroup group,  RadioButton button) {
+                                            Toast.makeText(MainActivity.this, Integer.toString(button.getId()), Toast.LENGTH_SHORT).show();
+                                            if (depencyIdList.contains(button.getId())) {
                                                 finalDependencyLayout1.setVisibility(View.VISIBLE);
                                                 // finalDependencyLayout.addView(finalDependencyLayout1);
                                             } else {
@@ -395,7 +583,7 @@ ArrayList<RequestModel>request=new ArrayList<>();
                                                     //finalDependencyLayout.removeView(finalDependencyLayout1);
                                                 }
                                             }
-                                            RadioButton button=(RadioButton)findViewById(checkedId);
+
                                             String radiobtnText=button.getText().toString();
                                             RequestModel model=map.get(depedencyLabel.getLabelText()+""+button.getText());
                                             handleRequest(model);
@@ -411,11 +599,11 @@ ArrayList<RequestModel>request=new ArrayList<>();
 
                         final LinearLayout finalDependencyLayout = dependencyLayout;
 
-                        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+                        radioGroup.setOnCheckedChangeListener(new MultiLineRadioGroup.OnCheckedChangeListener() {
                             @Override
-                            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                                Toast.makeText(MainActivity.this, Integer.toString(checkedId), Toast.LENGTH_SHORT).show();
-                                if (depencyIdList.contains(checkedId)) {
+                            public void onCheckedChanged(ViewGroup group,  RadioButton button) {
+                                Toast.makeText(MainActivity.this, Integer.toString(button.getId()), Toast.LENGTH_SHORT).show();
+                                if (depencyIdList.contains(button.getId())) {
                                     finalDependencyLayout.setVisibility(View.VISIBLE);
                                 } else {
                                     if (finalDependencyLayout != null) {
@@ -424,7 +612,6 @@ ArrayList<RequestModel>request=new ArrayList<>();
 
 
                                 }
-                                RadioButton button=(RadioButton)findViewById(checkedId);
                                 RequestModel model=map.get(labels.getLabelText()+""+button.getText().toString());
                                 handleRequest(model);
                             }
@@ -469,26 +656,55 @@ ArrayList<RequestModel>request=new ArrayList<>();
 
 /*********************************************************************************************************************************************************/
     /******************** TextView***********************/
-    public TextView getTextView(String text)
+    public TextView getTextView(String text ,int levelId)
     {
         TextView label = new TextView(this);
-        label.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+
+        if(levelId==1) {
+            lp.setMargins(20, 10, 20, 10);
+        }else if(levelId==2)
+        {
+            lp.setMargins(50, 10, 20, 10);
+        }
+        else if(levelId==3)
+        {
+            lp.setMargins(80, 10, 20, 10);
+        }
+        else if(levelId==4)
+        {
+            lp.setMargins(120, 10, 20, 10);
+        }
+        label.setLayoutParams(lp);
         label.setGravity(Gravity.LEFT);
         label.setText(text);
         label.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-        label.setPadding(20, 20, 20, 20);// in pix
+
         return label;
     }
     /*******************EditText*************************/
-    public EditText getEditText()
+    public EditText getEditText(int levelId)
     {
-       EditText labelvalue = new  EditText(this);
+        EditText labelvalue = new  EditText(this);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,60);
-        lp.setMargins(20,10,20,10);
+        if(levelId==1) {
+            lp.setMargins(20, 10, 20, 10);
+        }else if(levelId==2)
+        {
+            lp.setMargins(50, 10, 20, 10);
+        }
+        else if(levelId==3)
+        {
+            lp.setMargins(80, 10, 20, 10);
+        }
+        else if(levelId==4)
+        {
+            lp.setMargins(120, 10, 20, 10);
+        }
         labelvalue.setLayoutParams(lp);
         labelvalue.setGravity(Gravity.LEFT);
         labelvalue.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-        labelvalue.setPadding(30, 5, 30, 5);// in pixels (
+        labelvalue.setPadding(10, 5, 10, 5);// in pixels (
         labelvalue.setBackgroundDrawable(getResources().getDrawable(R.drawable.blurr_bg_edittext));
 
         return labelvalue;
@@ -496,14 +712,27 @@ ArrayList<RequestModel>request=new ArrayList<>();
     /*********************Radio*************************/
     public RadioButton getRadioButton(String text)
     {
-      RadioButton radioButton  = new RadioButton(this);
+        RadioButton radioButton  = new RadioButton(this);
+
         radioButton .setText(text);
         return radioButton;
     }
     /*******************CheckBox**********************/
-    public CheckBox getCheckBox(String text)
-    {
- CheckBox chbox= new CheckBox(this);
+    public CheckBox getCheckBox(String text,int levelId)
+    {    LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        CheckBox chbox= new CheckBox(this);
+
+        if(levelId==1) {
+            lp.setMargins(20, 10, 20, 10);
+        }else if(levelId==2)
+        {
+            lp.setMargins(50, 10, 20, 10);
+        }
+        else if(levelId==3)
+        {
+            lp.setMargins(80, 10, 20, 10);
+        }
+        chbox.setLayoutParams(lp);
         chbox.setText(text);
         return chbox;
 
@@ -511,7 +740,7 @@ ArrayList<RequestModel>request=new ArrayList<>();
     /********************View************************/
     public View getView()
     {
-       View view =new View(this);
+        View view =new View(this);
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 1);
         layoutParams.setMargins(5, 5, 5, 5);
         view.setLayoutParams(layoutParams);
@@ -521,7 +750,7 @@ ArrayList<RequestModel>request=new ArrayList<>();
     /*******************Button**********************/
     public Button getButton(String text)
     {
-     Button button =new Button(this);
+        Button button =new Button(this);
         button.setText(text);
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         layoutParams.setMargins(5, 30, 5, 30);
@@ -535,7 +764,7 @@ ArrayList<RequestModel>request=new ArrayList<>();
     /*******************getLinearLayout**************/
     public LinearLayout getLinearLayout()
     {
-      LinearLayout  layout= new LinearLayout(MainActivity.this);
+        LinearLayout  layout= new LinearLayout(MainActivity.this);
         layout.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
         layout.setOrientation(LinearLayout.VERTICAL);
         return layout;
@@ -559,11 +788,13 @@ ArrayList<RequestModel>request=new ArrayList<>();
         for (int i = 0; i < request.size(); i++) {
             RequestModel addedModel = request.get(i);
             if ((addedModel.getLabel_id().equalsIgnoreCase(model.getLabel_id())) && (addedModel.getParent_label_id().equalsIgnoreCase(model.getParent_label_id()))) {
-
                 if(model.getOption_value().length()>0) {
+                    removeAllRelatedViews(addedModel.getParent_label_id());
                     request.set(i, model);
+
                 }else{
                     request.remove(i);
+
                 }
 
                 return true;
@@ -571,6 +802,18 @@ ArrayList<RequestModel>request=new ArrayList<>();
 
         }
         return false;
+    }
+    public void removeAllRelatedViews(String id)
+    { int x=request.size();
+        for (int i = 0; i < x; i++) {
+            RequestModel addedModel = request.get(i);
+            if(addedModel.getParent_label_id().equalsIgnoreCase(id))
+            {
+                request.remove(i);
+                x=x-1;
+                i=i-1;
+            }
+        }
     }
 
     public JSONObject getRequestJson() {
