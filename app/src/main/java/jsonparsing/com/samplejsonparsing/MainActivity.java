@@ -789,7 +789,7 @@ public class MainActivity extends AppCompatActivity {
             RequestModel addedModel = request.get(i);
             if ((addedModel.getLabel_id().equalsIgnoreCase(model.getLabel_id())) && (addedModel.getParent_label_id().equalsIgnoreCase(model.getParent_label_id()))) {
                 if(model.getOption_value().length()>0) {
-                    removeAllRelatedViews(addedModel.getParent_label_id());
+                   // removeAllRelatedViews(addedModel.getParent_label_id());
                     request.set(i, model);
 
                 }else{
@@ -811,7 +811,6 @@ public class MainActivity extends AppCompatActivity {
             {
                 request.remove(i);
                 x=x-1;
-                i=i-1;
             }
         }
     }
