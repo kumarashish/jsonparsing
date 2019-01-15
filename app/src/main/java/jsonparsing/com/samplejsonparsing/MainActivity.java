@@ -790,7 +790,7 @@ public class MainActivity extends AppCompatActivity {
             if (isModelPresent(model) == false) {
                 if(model.getDefaultt().equalsIgnoreCase("0")) {
                     request.add(model);
-                    Log.d("tag", "handleRequest: "+request.indexOf(model));
+                    Log.d("tag", "ha ndleRequest: "+request.indexOf(model));
                 }
             }
 
