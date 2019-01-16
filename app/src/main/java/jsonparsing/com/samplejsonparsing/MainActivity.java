@@ -23,6 +23,12 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.flexbox.AlignItems;
+import com.google.android.flexbox.FlexDirection;
+import com.google.android.flexbox.FlexWrap;
+import com.google.android.flexbox.FlexboxLayout;
+import com.google.android.flexbox.FlexboxLayoutManager;
+import com.google.android.flexbox.JustifyContent;
 import com.whygraphics.multilineradiogroup.MultiLineRadioGroup;
 
 import org.json.JSONArray;
@@ -41,13 +47,12 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<String>dependency=new ArrayList<>();
     ArrayList<RequestModel>request=new ArrayList<>();
     HashMap<String, RequestModel> map = new HashMap<String, RequestModel>();
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mainLayout=(LinearLayout)findViewById(R.id.mainlayout);
-        jsonParsing();
+       // jsonParsing();
 
     }
     public void jsonParsing()
@@ -185,7 +190,7 @@ public class MainActivity extends AppCompatActivity {
                                     radioGroupp.setOrientation(LinearLayout.HORIZONTAL);
                                     radioGroupp.setPadding(40,0,40,0);
                                     radioGroupp.setMaxInRow(3);
-                                    final LinearLayout dependencyLayout2 =getLinearLayout();
+                                    final FlexboxLayout dependencyLayout2 =getFlexLayout();
                                     if (widgetType.equalsIgnoreCase("text")) {
                                         EditText labelvalue = getEditText(2);
                                         labelvalue.setTag(depedencyLabel.getLabelText());
@@ -401,7 +406,7 @@ public class MainActivity extends AppCompatActivity {
                                             final CheckBox chbox = getCheckBox(dependencyLabelOptions.optionText,2);
                                             RequestModel model3=new RequestModel(depedencyLabel.getId(),depedencyLabel.getLabelText(),dependencyLabelOptions.id,dependencyLabelOptions.getOptionText(),op.getId(),dependencyLabelOptions.getDefaultt(),true,2,chbox);
                                             map.put(depedencyLabel.getLabelText()+""+dependencyLabelOptions.optionText,model3);
-                                            final LinearLayout  dependencyLayout3=getLinearLayout();
+                                            final FlexboxLayout dependencyLayout3=getFlexLayout();
                                             chbox.setId(Integer.parseInt(dependencyLabelOptions.getId()));
                                             if(dependencyLabelOptions.getDefaultt().equalsIgnoreCase("1"))
                                             {
@@ -587,7 +592,7 @@ public class MainActivity extends AppCompatActivity {
                                         dependencyLayout2.setVisibility(View.GONE);
                                         dependencyLayout.addView(dependencyLayout2);
                                     }
-                                    final LinearLayout finalDependencyLayout1 = dependencyLayout2;
+                                    final FlexboxLayout finalDependencyLayout1 = dependencyLayout2;
                                     final LinearLayout finalDependencyLayout = dependencyLayout;
                                     radioGroupp.setOnCheckedChangeListener(new MultiLineRadioGroup.OnCheckedChangeListener() {
                                         @Override
@@ -774,6 +779,19 @@ public class MainActivity extends AppCompatActivity {
         return button;
     }
 
+    /*******************getFlexLay**************/
+    public FlexboxLayout getFlexLayout()
+    {
+        FlexboxLayout  layout= new FlexboxLayout(MainActivity.this);
+        layout.setLayoutParams(new FlexboxLayout.LayoutParams(FlexboxLayout.LayoutParams.MATCH_PARENT, FlexboxLayout.LayoutParams.WRAP_CONTENT));
+        layout.setFlexWrap(FlexWrap.WRAP);
+        layout.setFlexDirection(FlexDirection.ROW);
+        layout.setJustifyContent(JustifyContent.CENTER);
+        layout.setAlignItems(AlignItems.CENTER);
+        return layout;
+    }
+
+
     /*******************getLinearLayout**************/
     public LinearLayout getLinearLayout()
     {
@@ -811,6 +829,8 @@ public class MainActivity extends AppCompatActivity {
             }
         }}
 
+
+
     public boolean isModelPresent(RequestModel model) {
 
         for (int i = 0; i < request.size(); i++) {
@@ -826,6 +846,9 @@ public class MainActivity extends AppCompatActivity {
                             if(request.indexOf(model)!=-1) {
 
                                 request.remove(request.indexOf(model));
+                            }else if((addedModel.getLabel_id().equalsIgnoreCase(model.getLabel_id()))&&((addedModel.getParent_label_id().equalsIgnoreCase(model.getParent_label_id()))))
+                            {
+                                request.remove(request.indexOf(addedModel));
                             }
 
                         }
@@ -850,14 +873,13 @@ public class MainActivity extends AppCompatActivity {
         for (int i = 0; i < request.size(); i++) {
             RequestModel addedModel = request.get(i);
             if (addedModel.getParent_label_id().equalsIgnoreCase(model.getOption_id())) {
-
                 {
                     if (ischildPresent(addedModel.getOption_id())) {
                         if(!addedModel.getOption_id().equalsIgnoreCase("0")) {
                             removeAllRelatedViews(addedModel);
                         }
                     }
-                    handleCheckUncheck(addedModel.getType(),addedModel.getView());
+                  handleCheckUncheck(addedModel.getType(),addedModel.getView());
                     if(request.indexOf(addedModel)!=-1)
                     {
                         request.remove(request.indexOf(addedModel));
