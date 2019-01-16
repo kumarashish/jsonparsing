@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mainLayout=(LinearLayout)findViewById(R.id.mainlayout);
-       // jsonParsing();
+       jsonParsing();
 
     }
     public void jsonParsing()
