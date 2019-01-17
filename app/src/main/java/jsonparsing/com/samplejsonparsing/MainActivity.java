@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
     public void jsonParsing()
     {
         try{
-            JSONObject jsonObject=new JSONObject(Common.json3);
+            JSONObject jsonObject=new JSONObject(Common.json2);
             if(jsonObject.getString("code").equalsIgnoreCase("200"))
             {
 
@@ -158,6 +158,7 @@ public class MainActivity extends AppCompatActivity {
                         radioGroup.setMaxInRow(3);
 
                         LinearLayout dependencyLayout = null;
+                        FlexboxLayout depedencyFlexLayout=null;
 
                         /* ---------------------------options check------------------------------------------------------*/
                         for (int k = 0; k < labels.getOptions().size(); k++) {
@@ -179,10 +180,10 @@ public class MainActivity extends AppCompatActivity {
                             if (labels.options.get(k).dependencyLabels.size() > 0) {
                                 depencyIdList.add(Integer.parseInt(op.getId()));
                                 dependencyLayout = getLinearLayout();
+                                depedencyFlexLayout=getFlexLayout();
                                 /* ---------------------------dependency labels check------------------------------------------------------*/
                                 for (int m = 0; m < labels.options.get(k).dependencyLabels.size(); m++) {
                                     final FormModel.Labels depedencyLabel = labels.options.get(k).dependencyLabels.get(m);
-
                                     TextView textView = getTextView(depedencyLabel.getLabelText(),2);
                                     dependencyLayout.addView(textView);
                                     String widgetType = depedencyLabel.widgetType;
@@ -190,7 +191,8 @@ public class MainActivity extends AppCompatActivity {
                                     radioGroupp.setOrientation(LinearLayout.HORIZONTAL);
                                     radioGroupp.setPadding(40,0,40,0);
                                     radioGroupp.setMaxInRow(3);
-                                    final FlexboxLayout dependencyLayout2 =getFlexLayout();
+                                    final LinearLayout dependencyLayout2 =getLinearLayout();
+
                                     if (widgetType.equalsIgnoreCase("text")) {
                                         EditText labelvalue = getEditText(2);
                                         labelvalue.setTag(depedencyLabel.getLabelText());
@@ -240,10 +242,12 @@ public class MainActivity extends AppCompatActivity {
                                                 final  FormModel.Labels level2label = dependencyLabelOptions.getDependency().get(x);
                                                 TextView label2Text = getTextView(level2label.getLabelText(),3);
                                                 dependencyLayout2.addView(label2Text);
+                                                final FlexboxLayout dependencyFlexLayout2 =getFlexLayout();
                                                 /* ------------------------------------------------------------------------------------------------------------------*/
                                                 String widgetType2 = level2label.widgetType;
 
                                                 if (widgetType2.equalsIgnoreCase("text")) {
+
                                                     EditText labelvalue = getEditText(3);
                                                     labelvalue.setTag(level2label.getLabelText());
                                                     labelvalue.setId(Integer.parseInt(level2label.getId()));
@@ -272,7 +276,7 @@ public class MainActivity extends AppCompatActivity {
                                                         }
                                                     });
                                                 }
-
+                                                final LinearLayout dependencyLayout4=getLinearLayout();
                                                 for (int y = 0; y < level2label.getOptions().size(); y++) {
                                                     final FormModel.Options options2 = level2label.options.get(y);
                                                     RequestModel model2=new RequestModel(level2label.getId(),level2label.getLabelText(),options2.getId(),options2.getOptionText(),dependencyLabelOptions.getId(),options2.getDefaultt(),false,0,null);
@@ -285,8 +289,10 @@ public class MainActivity extends AppCompatActivity {
                                                         {
                                                             chbox.setChecked(true);
                                                         }
-                                                        dependencyLayout2.addView(chbox);
+                                                        dependencyFlexLayout2.addView(chbox);
+                                                        //dependencyLayout2.addView(chbox);
                                                          final LinearLayout dependencyLayout3=getLinearLayout();
+
                                                         chbox .setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                                                             @Override
                                                             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -343,7 +349,7 @@ public class MainActivity extends AppCompatActivity {
                                                                }
                                                                if(dependencyLayout3.getChildCount()>0)
                                                                {    dependencyLayout3.setVisibility(View.GONE);
-                                                                   dependencyLayout2.addView(dependencyLayout3);
+                                                                   dependencyLayout4.addView(dependencyLayout3);
                                                                }
 
 
@@ -397,6 +403,9 @@ public class MainActivity extends AppCompatActivity {
 
                                                 }
 
+                                                dependencyLayout2.addView(dependencyFlexLayout2);
+                                                dependencyLayout2.addView(dependencyLayout4);
+
 //
 
                                                 /* ------------------------------------------------------------------------------------------------------------------*/
@@ -406,13 +415,14 @@ public class MainActivity extends AppCompatActivity {
                                             final CheckBox chbox = getCheckBox(dependencyLabelOptions.optionText,2);
                                             RequestModel model3=new RequestModel(depedencyLabel.getId(),depedencyLabel.getLabelText(),dependencyLabelOptions.id,dependencyLabelOptions.getOptionText(),op.getId(),dependencyLabelOptions.getDefaultt(),true,2,chbox);
                                             map.put(depedencyLabel.getLabelText()+""+dependencyLabelOptions.optionText,model3);
-                                            final FlexboxLayout dependencyLayout3=getFlexLayout();
+                                            final LinearLayout dependencyLayout3=getLinearLayout();
                                             chbox.setId(Integer.parseInt(dependencyLabelOptions.getId()));
                                             if(dependencyLabelOptions.getDefaultt().equalsIgnoreCase("1"))
                                             {
                                                 chbox.setChecked(true);
                                             }
-                                            dependencyLayout.addView(chbox);
+                                            depedencyFlexLayout.addView(chbox);
+                                          //  dependencyLayout.addView(depedencyFlexLayout);
                                             chbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                                                 @Override
                                                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -445,7 +455,7 @@ public class MainActivity extends AppCompatActivity {
                                                         depencyIdList.add(Integer.parseInt(dependencyLabelOptions.getId()));
                                                         final  FormModel.Labels level2label = dependencyLabelOptions.getDependency().get(x);
                                                         TextView label2Text = getTextView(level2label.getLabelText(),3);
-                                                        dependencyLayout3.addView(label2Text);
+                                                      dependencyLayout3.addView(label2Text);
                                                 /* ------------------------------------------------------------------------------------------------------------------*/
                                                         String widgetType2 = level2label.widgetType;
 
@@ -557,6 +567,7 @@ public class MainActivity extends AppCompatActivity {
 
                                                 }
                                             });
+
                                         } else if (widgetType.equalsIgnoreCase("text")) {
                                             TextView label = getTextView(dependencyLabelOptions.optionText,2);
                                             dependencyLayout.addView(label);
@@ -585,14 +596,32 @@ public class MainActivity extends AppCompatActivity {
                                             });
 
                                         }
+
+
                                     }
 
                                     if (radioGroupp != null) {
                                         dependencyLayout.addView(radioGroupp);
                                         dependencyLayout2.setVisibility(View.GONE);
                                         dependencyLayout.addView(dependencyLayout2);
+
                                     }
-                                    final FlexboxLayout finalDependencyLayout1 = dependencyLayout2;
+
+                                    if(depedencyFlexLayout.getChildCount()!=0)
+                                    {
+                                        try {
+                                            LinearLayout llYOUT=getLinearLayout();
+                                            llYOUT.addView(depedencyFlexLayout);
+                                            dependencyLayout.addView(llYOUT);
+                                            depedencyFlexLayout=getFlexLayout();
+                                        }catch (Exception ex)
+                                        {
+                                            ex.fillInStackTrace();
+                                        }
+                                    }
+
+
+                                    final LinearLayout finalDependencyLayout1 = dependencyLayout2;
                                     final LinearLayout finalDependencyLayout = dependencyLayout;
                                     radioGroupp.setOnCheckedChangeListener(new MultiLineRadioGroup.OnCheckedChangeListener() {
                                         @Override
@@ -620,6 +649,7 @@ public class MainActivity extends AppCompatActivity {
                                     });
 
                                 }
+
                             }
                         }
                         mainLayout.addView(radioGroup);
@@ -783,11 +813,10 @@ public class MainActivity extends AppCompatActivity {
     public FlexboxLayout getFlexLayout()
     {
         FlexboxLayout  layout= new FlexboxLayout(MainActivity.this);
-        layout.setLayoutParams(new FlexboxLayout.LayoutParams(FlexboxLayout.LayoutParams.MATCH_PARENT, FlexboxLayout.LayoutParams.WRAP_CONTENT));
+        layout.setLayoutParams(new FlexboxLayout.LayoutParams(FlexboxLayout.LayoutParams.WRAP_CONTENT, FlexboxLayout.LayoutParams.WRAP_CONTENT));
         layout.setFlexWrap(FlexWrap.WRAP);
         layout.setFlexDirection(FlexDirection.ROW);
-        layout.setJustifyContent(JustifyContent.CENTER);
-        layout.setAlignItems(AlignItems.CENTER);
+        layout.setAlignItems(AlignItems.FLEX_START);
         return layout;
     }
 
