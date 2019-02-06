@@ -1,6 +1,7 @@
 package jsonparsing.com.samplejsonparsing;
 
 import android.Manifest;
+import android.content.Context;
 import android.net.LinkAddress;
 import android.nfc.Tag;
 import android.support.v7.app.AppCompatActivity;
@@ -11,6 +12,7 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -58,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
     public void jsonParsing()
     {
         try{
-            JSONObject jsonObject=new JSONObject(Common.json5);
+            JSONObject jsonObject=new JSONObject(Common.json25);
             if(jsonObject.getString("code").equalsIgnoreCase("200"))
             {
 
@@ -109,22 +111,47 @@ public class MainActivity extends AppCompatActivity {
             View vieww = getView();
             mainLayout.addView(vieww);
             /* -------------------------------------*/
+
+
             for (int i = 0; i < formModel.getSection().size(); i++) {
+
                 FormModel.Sections sections = formModel.section.get(i);
-                TextView heading = getTextView(sections.getTitle().toUpperCase(),1);
-                mainLayout.addView(heading);
+               //TextView heading = getTextView(sections.getTitle().toUpperCase(),1);
+
+                LayoutInflater inflater = (LayoutInflater)   getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                View view = inflater.inflate(R.layout.newlayout, null);
+                TextView headingText =(TextView)view.findViewById(R.id.heading) ;
+                final Button expandedButton =(Button)view.findViewById(R.id.expandableButton) ;
+                final LinearLayout content=(LinearLayout)view.findViewById(R.id.content);
+                headingText.setText(sections.getTitle());
+                FormModel.SubSections subSections=sections.getLabels().get(i);
+                expandedButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if(content.getVisibility()==View.GONE)
+                        {
+                            expandedButton.setText("Collapse");
+                            content.setVisibility(View.VISIBLE);
+                        }else{
+                            expandedButton.setText("Expand");
+                            content.setVisibility(View.GONE);
+
+                        }
+                    }
+                });
+
 
                 /* ---------------------------labels check------------------------------------------------------*/
-                for (int j = 0; j < sections.getLabels().size(); j++) {
-                    final FormModel.Labels labels = sections.labels.get(j);
+                for (int j = 0; j < subSections.getLabels().size(); j++) {
+                    final FormModel.Labels labels = subSections.labels.get(j);
                     if (labels.getWidgetType().equalsIgnoreCase("text")) {
                         TextView labelText = getTextView(labels.getLabelText(),1);
-                        mainLayout.addView(labelText);
+                        content.addView(labelText);
                         EditText labelvalue = getEditText(1);
                         labelvalue.setTag(labels.getLabelText());
                         labelvalue.setId(Integer.parseInt(labels.getId()));
                         editTextList.add(labelvalue);
-                        mainLayout.addView(labelvalue);
+                        content.addView(labelvalue);
                         map.put(labels.getLabelText(),new RequestModel(labels.getId(),labels.getLabelText(),"0","","0","0",false,0,labelvalue));
                         labelvalue.addTextChangedListener(new TextWatcher() {
                             @Override
@@ -149,7 +176,7 @@ public class MainActivity extends AppCompatActivity {
                     } else {
 
                         TextView labelText = getTextView(labels.getLabelText(),1);
-                        mainLayout.addView(labelText);
+                        content.addView(labelText);
                         /* ------------------------------------------------------------------------------------------------------------------*/
 
                         final MultiLineRadioGroup radioGroup = new MultiLineRadioGroup(this);
@@ -159,7 +186,7 @@ public class MainActivity extends AppCompatActivity {
 
                         LinearLayout dependencyLayout = null;
                         FlexboxLayout depedencyFlexLayout=null;
-
+                        LinearLayout MYLAYOUT;
                         /* ---------------------------options check------------------------------------------------------*/
                         for (int k = 0; k < labels.getOptions().size(); k++) {
                             final FormModel.Options op = labels.options.get(k);
@@ -181,6 +208,7 @@ public class MainActivity extends AppCompatActivity {
                                 depencyIdList.add(Integer.parseInt(op.getId()));
                                 dependencyLayout = getLinearLayout();
                                 depedencyFlexLayout=getFlexLayout();
+                                MYLAYOUT=getLinearLayout();
                                 /* ---------------------------dependency labels check------------------------------------------------------*/
                                 for (int m = 0; m < labels.options.get(k).dependencyLabels.size(); m++) {
                                     final FormModel.Labels depedencyLabel = labels.options.get(k).dependencyLabels.get(m);
@@ -225,6 +253,7 @@ public class MainActivity extends AppCompatActivity {
                                     /* ---------------------------dependency options check------------------------------------------------------*/
                                     for (int n = 0; n < depedencyLabel.getOptions().size(); n++) {
                                         final FormModel.Options dependencyLabelOptions = depedencyLabel.getOptions().get(n);
+
                                         if (widgetType.equalsIgnoreCase("radio")) {
                                             RadioButton radioBtn = getRadioButton(dependencyLabelOptions.optionText);
                                             radioBtn.setId(Integer.parseInt(dependencyLabelOptions .getId()));
@@ -245,27 +274,21 @@ public class MainActivity extends AppCompatActivity {
                                                 final FlexboxLayout dependencyFlexLayout2 =getFlexLayout();
                                                 /* ------------------------------------------------------------------------------------------------------------------*/
                                                 String widgetType2 = level2label.widgetType;
-
                                                 if (widgetType2.equalsIgnoreCase("text")) {
-
                                                     EditText labelvalue = getEditText(3);
                                                     labelvalue.setTag(level2label.getLabelText());
                                                     labelvalue.setId(Integer.parseInt(level2label.getId()));
                                                     RequestModel model2=new RequestModel(level2label.getId(),level2label.getLabelText(),"0","",dependencyLabelOptions.getId(),"0",false,0,labelvalue);
                                                     map.put(level2label.getLabelText(),model2);
-
-
                                                     editTextList.add(labelvalue);
                                                     dependencyLayout2.addView(labelvalue);
                                                     labelvalue.addTextChangedListener(new TextWatcher() {
                                                         @Override
                                                         public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
                                                         }
 
                                                         @Override
                                                         public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
                                                         }
 
                                                         @Override
@@ -302,11 +325,11 @@ public class MainActivity extends AppCompatActivity {
                                                                 if(isChecked) {
                                                                     handleRequest(model);
                                                                     if (depencyIdList.contains(chbox.getId())) {
-                                                                        dependencyLayout3.setVisibility(View.VISIBLE);
+                                                                        dependencyLayout4.setVisibility(View.VISIBLE);
                                                                     }
                                                                 }else{
                                                                     removeItem( model);
-                                                                    dependencyLayout3.setVisibility(View.GONE);
+                                                                    dependencyLayout4.setVisibility(View.GONE);
                                                                 }
                                                             }
                                                         });
@@ -327,6 +350,7 @@ public class MainActivity extends AppCompatActivity {
 
                                                                    editTextList.add(labelvalue);
                                                                    dependencyLayout3.addView(labelvalue);
+                                                                   dependencyLayout4.addView(dependencyLayout3);
                                                                    labelvalue.addTextChangedListener(new TextWatcher() {
                                                                        @Override
                                                                        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -412,6 +436,7 @@ public class MainActivity extends AppCompatActivity {
 
                                             }
                                         } else if (widgetType.equalsIgnoreCase("checkbox")) {
+
                                             final CheckBox chbox = getCheckBox(dependencyLabelOptions.optionText,2);
                                             RequestModel model3=new RequestModel(depedencyLabel.getId(),depedencyLabel.getLabelText(),dependencyLabelOptions.id,dependencyLabelOptions.getOptionText(),op.getId(),dependencyLabelOptions.getDefaultt(),true,2,chbox);
                                             map.put(depedencyLabel.getLabelText()+""+dependencyLabelOptions.optionText,model3);
@@ -463,11 +488,12 @@ public class MainActivity extends AppCompatActivity {
                                                     Toast.makeText(MainActivity.this, checkedItem, Toast.LENGTH_SHORT).show();
                                                 }});
 
+
                                                     for (int x = 0; x < dependencyLabelOptions.getDependency().size(); x++) {
                                                         depencyIdList.add(Integer.parseInt(dependencyLabelOptions.getId()));
                                                         final  FormModel.Labels level2label = dependencyLabelOptions.getDependency().get(x);
                                                         TextView label2Text = getTextView(level2label.getLabelText(),3);
-                                                      dependencyLayout3.addView(label2Text);
+                                                         dependencyLayout3.addView(label2Text);
                                                 /* ------------------------------------------------------------------------------------------------------------------*/
                                                         String widgetType2 = level2label.widgetType;
 
@@ -480,7 +506,12 @@ public class MainActivity extends AppCompatActivity {
 
 
                                                             editTextList.add(labelvalue);
-                                                            dependencyLayout3.addView(labelvalue);
+                                                             dependencyLayout3.addView(labelvalue);
+
+
+
+
+                                                           // mainLayout.addView(labelvalue);
                                                             labelvalue.addTextChangedListener(new TextWatcher() {
                                                                 @Override
                                                                 public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -499,84 +530,87 @@ public class MainActivity extends AppCompatActivity {
                                                                     handleRequest(model);
                                                                 }
                                                             });
-                                                        }
-
-                                                        for (int y = 0; y < level2label.getOptions().size(); y++) {
-                                                            FormModel.Options options2 = level2label.options.get(y);
-                                                            RequestModel model2=new RequestModel(level2label.getId(),level2label.getLabelText(),options2.getId(),options2.getOptionText(),dependencyLabelOptions.getId(),options2.getDefaultt(),false,0,null);
-                                                            map.put(level2label.getLabelText()+""+options2.getOptionText(),model2);
-
-                                                            if (widgetType2.equalsIgnoreCase("Checkbox")) {
-                                                                final CheckBox chboxx = getCheckBox(options2.optionText,3);
-                                                                chboxx.setId(Integer.parseInt(options2.getId()));
-                                                                if((options2.getDefaultt().equalsIgnoreCase("1")))
-                                                                {
-                                                                    chboxx.setChecked(true);
-                                                                }
-                                                                dependencyLayout3.addView(chboxx);
-
-                                                                chboxx .setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                                                                    @Override
-                                                                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
 
-                                                                        RequestModel model=map.get(level2label.getLabelText()+""+chboxx.getText().toString());
-                                                                        model.setIsCheckbox(true);
-                                                                        model.setView(2,chboxx);
-                                                                        if(isChecked) {
-                                                                            handleRequest(model);
-                                                                        }else {
-                                                                            removeItem(model);
+                                                        }else {
+
+                                                            for (int y = 0; y < level2label.getOptions().size(); y++) {
+                                                                FormModel.Options options2 = level2label.options.get(y);
+                                                                RequestModel model2 = new RequestModel(level2label.getId(), level2label.getLabelText(), options2.getId(), options2.getOptionText(), dependencyLabelOptions.getId(), options2.getDefaultt(), false, 0, null);
+                                                                map.put(level2label.getLabelText() + "" + options2.getOptionText(), model2);
+
+                                                                if (widgetType2.equalsIgnoreCase("Checkbox")) {
+                                                                    final CheckBox chboxx = getCheckBox(options2.optionText, 3);
+                                                                    chboxx.setId(Integer.parseInt(options2.getId()));
+                                                                    if ((options2.getDefaultt().equalsIgnoreCase("1"))) {
+                                                                        chboxx.setChecked(true);
+                                                                    }
+                                                                    dependencyLayout3.addView(chboxx);
+
+                                                                    chboxx.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                                                                        @Override
+                                                                        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+
+                                                                            RequestModel model = map.get(level2label.getLabelText() + "" + chboxx.getText().toString());
+                                                                            model.setIsCheckbox(true);
+                                                                            model.setView(2, chboxx);
+                                                                            if (isChecked) {
+                                                                                handleRequest(model);
+                                                                            } else {
+                                                                                removeItem(model);
+                                                                            }
                                                                         }
-                                                                    }
-                                                                });
+                                                                    });
 
-                                                            } else if (widgetType2.equalsIgnoreCase("text")) {
-                                                                EditText labelvalue = getEditText(3);
-                                                                labelvalue.setTag(options2.optionText);
-                                                                labelvalue.setId(Integer.parseInt(options2.getId()));
-                                                                RequestModel model33=new RequestModel(level2label.getId(),level2label.getLabelText(),"0","",dependencyLabelOptions.getId(),dependencyLabelOptions.getDefaultt(),false,0,labelvalue);
-                                                                map.put(level2label.getLabelText(),model33);
+                                                                } else if (widgetType2.equalsIgnoreCase("text")) {
+                                                                    EditText labelvalue = getEditText(3);
+                                                                    labelvalue.setTag(options2.optionText);
+                                                                    labelvalue.setId(Integer.parseInt(options2.getId()));
+                                                                    RequestModel model33 = new RequestModel(level2label.getId(), level2label.getLabelText(), "0", "", dependencyLabelOptions.getId(), dependencyLabelOptions.getDefaultt(), false, 0, labelvalue);
+                                                                    map.put(level2label.getLabelText(), model33);
 
-                                                                TextView label = getTextView(options2.optionText,3);
-                                                                dependencyLayout3.addView(label);
+                                                                    TextView label = getTextView(options2.optionText, 3);
+                                                                    dependencyLayout3.addView(label);
 
-                                                                editTextList.add(labelvalue);
-                                                                dependencyLayout3.addView(labelvalue);
-                                                                labelvalue.addTextChangedListener(new TextWatcher() {
-                                                                    @Override
-                                                                    public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                                                                    editTextList.add(labelvalue);
+                                                                    dependencyLayout3.addView(labelvalue);
+                                                                    labelvalue.addTextChangedListener(new TextWatcher() {
+                                                                        @Override
+                                                                        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
-                                                                    }
+                                                                        }
 
-                                                                    @Override
-                                                                    public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                                                                        @Override
+                                                                        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
-                                                                    }
+                                                                        }
 
-                                                                    @Override
-                                                                    public void afterTextChanged(Editable editable) {
-                                                                        RequestModel model=map.get(level2label.getLabelText());
-                                                                        model.setOption_value(editable.toString());
-                                                                        handleRequest(model);
-                                                                    }
-                                                                });
-                                                            } else if (widgetType2.equalsIgnoreCase("radio")) {
-                                                                RadioButton radioB = getRadioButton(options2.optionText);
-                                                                radioB.setId(Integer.parseInt(options2.getId()));
-                                                                dependencyLayout3.addView(radioB);
+                                                                        @Override
+                                                                        public void afterTextChanged(Editable editable) {
+                                                                            RequestModel model = map.get(level2label.getLabelText());
+                                                                            model.setOption_value(editable.toString());
+                                                                            handleRequest(model);
+                                                                        }
+                                                                    });
+                                                                } else if (widgetType2.equalsIgnoreCase("radio")) {
+                                                                    RadioButton radioB = getRadioButton(options2.optionText);
+                                                                    radioB.setId(Integer.parseInt(options2.getId()));
+                                                                    dependencyLayout3.addView(radioB);
 
+
+                                                                }
 
                                                             }
-
                                                         }
+                                                        dependencyLayout3.setVisibility(View.GONE);
+                                                        MYLAYOUT.addView(dependencyLayout3);
 
-//
+//}
 
                                                 /* ------------------------------------------------------------------------------------------------------------------*/
 
                                                     }
-
 
 
 
@@ -625,6 +659,12 @@ public class MainActivity extends AppCompatActivity {
                                             LinearLayout llYOUT=getLinearLayout();
                                             llYOUT.addView(depedencyFlexLayout);
                                             dependencyLayout.addView(llYOUT);
+                                            if(MYLAYOUT!=null) {
+                                                dependencyLayout.addView(MYLAYOUT);
+                                            }
+                                            MYLAYOUT=getLinearLayout();
+
+
                                             depedencyFlexLayout=getFlexLayout();
                                         }catch (Exception ex)
                                         {
@@ -664,7 +704,7 @@ public class MainActivity extends AppCompatActivity {
 
                             }
                         }
-                        mainLayout.addView(radioGroup);
+                        content.addView(radioGroup);
 
                         final LinearLayout finalDependencyLayout = dependencyLayout;
 
@@ -688,13 +728,15 @@ public class MainActivity extends AppCompatActivity {
                         });
                         if (dependencyLayout != null) {
                             dependencyLayout.setVisibility(View.GONE);
-                            mainLayout.addView(dependencyLayout);
+                            content.addView(dependencyLayout);
                         }
                     }
                 }
-                View view = getView();
+
+
                 mainLayout.addView(view);
             }
+
         }
         Button submit = getButton("Submit");
         submit.setOnClickListener(new View.OnClickListener() {
@@ -705,6 +747,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("TAG",request);
             }
         });
+
         mainLayout.addView(submit);
 
     }

@@ -46,17 +46,17 @@ public class FormModel {
     public class Sections
     {String title;
         String brief;
-        ArrayList< Labels> labels=new ArrayList<>();
+        ArrayList< SubSections> subsections=new ArrayList<>();
 
 public Sections(JSONObject jsonObject)
 {try {
     this.title = jsonObject.isNull("title") ? "" : jsonObject.getString("title");
     this.brief = jsonObject.isNull("brief") ? "" : jsonObject.getString("brief");
-    JSONArray jsonArray = jsonObject.isNull("labels")?null:jsonObject.getJSONArray("labels");
-    labels.clear();
+    JSONArray jsonArray = jsonObject.isNull("sub_sections")?null:jsonObject.getJSONArray("sub_sections");
+    subsections.clear();
     for(int i=0;i<jsonArray.length();i++)
     {
-        labels.add(new  Labels(jsonArray.getJSONObject(i)));
+        subsections.add(new SubSections(jsonArray.getJSONObject(i)));
     }
 }catch (Exception ex)
 {
@@ -64,8 +64,8 @@ public Sections(JSONObject jsonObject)
 }
 }
 
-        public ArrayList< Labels> getLabels() {
-            return  labels;
+        public ArrayList< SubSections> getLabels() {
+            return  subsections;
         }
 
         public String getBrief() {
@@ -76,6 +76,46 @@ public Sections(JSONObject jsonObject)
             return title;
         }
     }
+/*************************************************susections**********************************/
+public class SubSections
+{String title;
+    String format;
+    int subsectionId;
+    ArrayList< Labels> labels=new ArrayList<>();
+
+    public SubSections(JSONObject jsonObject)
+    {try {
+        this.subsectionId=jsonObject.isNull("sub_section_id") ? 0 : jsonObject.getInt("sub_section_id");
+        this.title = jsonObject.isNull("title") ? "" : jsonObject.getString("title");
+        this.format = jsonObject.isNull("format") ? "" : jsonObject.getString("format");
+        JSONArray jsonArray = jsonObject.isNull("labels")?null:jsonObject.getJSONArray("labels");
+        labels.clear();
+        for(int i=0;i<jsonArray.length();i++)
+        {
+            labels.add(new  Labels(jsonArray.getJSONObject(i)));
+        }
+    }catch (Exception ex)
+    {
+        ex.fillInStackTrace();
+    }
+    }
+
+    public int getSubsectionId() {
+        return subsectionId;
+    }
+
+    public ArrayList< Labels> getLabels() {
+        return  labels;
+    }
+
+    public String getformat() {
+        return format;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+}
 
     /*---------------------------------------labels------------------------------------------*/
     public class Labels{
