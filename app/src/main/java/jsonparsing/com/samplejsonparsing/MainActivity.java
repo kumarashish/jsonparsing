@@ -141,7 +141,7 @@ public class MainActivity extends AppCompatActivity {
                 });
 
 
-                /* ---------------------------labels check------------------------------------------------------*/
+                /* ---------------------------labels  check------------------------------------------------------*/
                 for (int j = 0; j < subSections.getLabels().size(); j++) {
                     final FormModel.Labels labels = subSections.labels.get(j);
                     if (labels.getWidgetType().equalsIgnoreCase("text")) {
